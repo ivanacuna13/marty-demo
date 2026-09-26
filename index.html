@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marty Fleet Sim</title>
+<meta name="description" content="Three camera robots and a drone film a shoot, the cloud edits it, and someone watches the post. A simulation.">
+<meta name="theme-color" content="#0b0d0e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="player.css">
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="brand"><i></i><b>Marty</b><span>a robot film crew · simulation</span></div>
+    <nav class="scenes" id="scenes" aria-label="Scenes"></nav>
+  </header>
+
+  <section class="screen" id="screen">
+    <video id="vid" playsinline preload="metadata"></video>
+    <button class="big-play" id="bigPlay" aria-label="Play"><span>▶</span><b>Watch the demo</b><small>1 minute · sound on</small></button>
+    <div class="pending" id="pending" hidden><b>This film is still rendering.</b><span>It appears here as soon as it is done.</span></div>
+    <div class="end" id="end" hidden>
+      <h2>Your turn</h2>
+      <p>Pick what the crew shoots next.</p>
+      <div class="starters" id="starters"></div>
+    </div>
+  </section>
+
+  <section class="controls">
+    <div class="chapters" id="chapters" role="slider" aria-label="Chapters"></div>
+    <div class="row">
+      <button class="ctl" id="play" aria-label="Play">▶</button>
+      <span class="time" id="time">0:00</span>
+      <span class="label">Direct it</span>
+      <div class="cmds" id="cmds"></div>
+      <button class="ctl" id="mute" aria-label="Mute">🔊</button>
+    </div>
+  </section>
+  <p class="foot">Rendered simulation. Robot and drone motion are rule-driven animation, not physics. The social apps are made up and nothing is posted. Numbers in the feed are illustrative.</p>
+</main>
+<script type="module" src="player.js"></script>
+</body>
+</html>

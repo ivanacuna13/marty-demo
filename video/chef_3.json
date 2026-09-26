@@ -1,0 +1,138 @@
+{
+ "name": "chef_3",
+ "scene": "chef",
+ "sceneName": "Cooking",
+ "cmd": 3,
+ "say": "Make the recipe-pin version.",
+ "dur": 49.73,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 28.27
+  },
+  {
+   "name": "Edit",
+   "t": 31.73
+  },
+  {
+   "name": "Post",
+   "t": 37.03
+  },
+  {
+   "name": "Seen",
+   "t": 38.7
+  }
+ ],
+ "seen": 38.700000000000365,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:chef:3",
+   "file": "cmd_chef_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 2.7,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 3.533,
+   "id": "shot:A:MS",
+   "file": "shot_A_MS.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 4.933,
+   "id": "shot:B:hands",
+   "file": "shot_B_hands.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 6.367,
+   "id": "shot:C:WS",
+   "file": "shot_C_WS.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 7.767,
+   "id": "drone:park",
+   "file": "drone_park.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 10.067,
+   "id": "radio:indoor",
+   "file": "radio_indoor.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 12.7,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 13.233,
+   "id": "line:chef:0",
+   "file": "line_chef_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 16.733,
+   "id": "line:chef:1",
+   "file": "line_chef_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 20.233,
+   "id": "line:chef:2",
+   "file": "line_chef_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 23.733,
+   "id": "line:chef:3",
+   "file": "line_chef_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 27.233,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 31.733,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 35.9,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 37.033,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 38.7,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

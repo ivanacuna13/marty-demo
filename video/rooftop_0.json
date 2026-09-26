@@ -1,0 +1,144 @@
+{
+ "name": "rooftop_0",
+ "scene": "rooftop",
+ "sceneName": "Rooftop story",
+ "cmd": 0,
+ "say": "Marty, founder story at golden hour. End on a drone pull-out.",
+ "dur": 56.5,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 34.17
+  },
+  {
+   "name": "Edit",
+   "t": 37.9
+  },
+  {
+   "name": "Post",
+   "t": 43.2
+  },
+  {
+   "name": "Seen",
+   "t": 45.47
+  }
+ ],
+ "seen": 45.46666666666665,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:rooftop:0",
+   "file": "cmd_rooftop_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 5.033,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 5.867,
+   "id": "shot:A:MS",
+   "file": "shot_A_MS.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 7.267,
+   "id": "shot:B:CU",
+   "file": "shot_B_CU.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 8.833,
+   "id": "shot:C:silhouette",
+   "file": "shot_C_silhouette.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 10.367,
+   "id": "drone:pullout",
+   "file": "drone_pullout.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 12.5,
+   "id": "radio:takeoff",
+   "file": "radio_takeoff.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 17.2,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 17.733,
+   "id": "line:rooftop:0",
+   "file": "line_rooftop_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 21.433,
+   "id": "line:rooftop:1",
+   "file": "line_rooftop_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 25.433,
+   "id": "line:rooftop:2",
+   "file": "line_rooftop_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 29.233,
+   "id": "line:rooftop:3",
+   "file": "line_rooftop_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 33.133,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 33.133,
+   "id": "radio:landing",
+   "file": "radio_landing.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 37.9,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 42.067,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 43.2,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 45.467,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

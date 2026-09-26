@@ -1,0 +1,150 @@
+{
+ "name": "interview_0",
+ "scene": "interview",
+ "sceneName": "Walking interview",
+ "cmd": 0,
+ "say": "Marty, walking interview. Two-shot plus singles.",
+ "dur": 62.63,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 40.23
+  },
+  {
+   "name": "Edit",
+   "t": 44.33
+  },
+  {
+   "name": "Post",
+   "t": 49.63
+  },
+  {
+   "name": "Seen",
+   "t": 51.6
+  }
+ ],
+ "seen": 51.59999999999963,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:interview:0",
+   "file": "cmd_interview_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 4.167,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 5,
+   "id": "shot:A:2-shot",
+   "file": "shot_A_2-shot.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 6.5,
+   "id": "shot:B:single",
+   "file": "shot_B_single.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 7.867,
+   "id": "shot:C:single",
+   "file": "shot_C_single.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 9.2,
+   "id": "drone:follow",
+   "file": "drone_follow.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 11.467,
+   "id": "radio:takeoff",
+   "file": "radio_takeoff.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 21.5,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 22.033,
+   "id": "line:interview:0",
+   "file": "line_interview_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 25.533,
+   "id": "line:interview:1",
+   "file": "line_interview_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 29.533,
+   "id": "line:interview:2",
+   "file": "line_interview_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 31.933,
+   "id": "line:interview:3",
+   "file": "line_interview_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 35.533,
+   "id": "line:interview:4",
+   "file": "line_interview_4.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 39.2,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 39.2,
+   "id": "radio:landing",
+   "file": "radio_landing.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 44.333,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 48.5,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 49.633,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 51.6,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

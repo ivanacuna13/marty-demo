@@ -1,0 +1,144 @@
+{
+ "name": "podcast_3",
+ "scene": "podcast",
+ "sceneName": "Podcast",
+ "cmd": 3,
+ "say": "Match the look of our last episode.",
+ "dur": 55.8,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 33.33
+  },
+  {
+   "name": "Edit",
+   "t": 37.5
+  },
+  {
+   "name": "Post",
+   "t": 42.8
+  },
+  {
+   "name": "Seen",
+   "t": 44.77
+  }
+ ],
+ "seen": 44.76666666666669,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:podcast:3",
+   "file": "cmd_podcast_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 3,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 3.833,
+   "id": "shot:A:CU",
+   "file": "shot_A_CU.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 5.333,
+   "id": "shot:B:CU",
+   "file": "shot_B_CU.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 6.9,
+   "id": "shot:C:2-shot",
+   "file": "shot_C_2-shot.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 8.433,
+   "id": "drone:park",
+   "file": "drone_park.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 10.767,
+   "id": "radio:indoor",
+   "file": "radio_indoor.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 14.167,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 14.7,
+   "id": "line:podcast:0",
+   "file": "line_podcast_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 18.6,
+   "id": "line:podcast:1",
+   "file": "line_podcast_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 22.4,
+   "id": "line:podcast:2",
+   "file": "line_podcast_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 25,
+   "id": "line:podcast:3",
+   "file": "line_podcast_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 28.6,
+   "id": "line:podcast:4",
+   "file": "line_podcast_4.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 32.3,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 37.5,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 41.667,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 42.8,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 44.767,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

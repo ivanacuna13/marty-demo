@@ -1,0 +1,144 @@
+{
+ "name": "house_2",
+ "scene": "house",
+ "sceneName": "Home tour",
+ "cmd": 2,
+ "say": "Twilight exterior orbit.",
+ "dur": 57.63,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 35.83
+  },
+  {
+   "name": "Edit",
+   "t": 39.63
+  },
+  {
+   "name": "Post",
+   "t": 44.93
+  },
+  {
+   "name": "Seen",
+   "t": 46.6
+  }
+ ],
+ "seen": 46.599999999999916,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:house:2",
+   "file": "cmd_house_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 2.5,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 3.333,
+   "id": "shot:A:lead",
+   "file": "shot_A_lead.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 4.633,
+   "id": "shot:B:MS",
+   "file": "shot_B_MS.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 6.067,
+   "id": "shot:C:hero",
+   "file": "shot_C_hero.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 7.8,
+   "id": "drone:orbit",
+   "file": "drone_orbit.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 9.967,
+   "id": "radio:takeoff",
+   "file": "radio_takeoff.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 18.5,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 18.933,
+   "id": "line:house:0",
+   "file": "line_house_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 22.533,
+   "id": "line:house:1",
+   "file": "line_house_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 26.533,
+   "id": "line:house:2",
+   "file": "line_house_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 30.933,
+   "id": "line:house:3",
+   "file": "line_house_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 34.8,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 34.8,
+   "id": "radio:landing",
+   "file": "radio_landing.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 39.633,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 43.8,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 44.933,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 46.6,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

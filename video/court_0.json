@@ -1,0 +1,150 @@
+{
+ "name": "court_0",
+ "scene": "court",
+ "sceneName": "Basketball",
+ "cmd": 0,
+ "say": "Marty, film my workout from the side, baseline and overhead.",
+ "dur": 54.17,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 32.63
+  },
+  {
+   "name": "Edit",
+   "t": 35.87
+  },
+  {
+   "name": "Post",
+   "t": 41.17
+  },
+  {
+   "name": "Seen",
+   "t": 43.13
+  }
+ ],
+ "seen": 43.13333333333345,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:court:0",
+   "file": "cmd_court_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 4.3,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 5.133,
+   "id": "shot:A:side",
+   "file": "shot_A_side.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 6.767,
+   "id": "shot:B:baseline",
+   "file": "shot_B_baseline.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 8.4,
+   "id": "shot:C:corner",
+   "file": "shot_C_corner.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 9.833,
+   "id": "drone:overhead",
+   "file": "drone_overhead.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 12.033,
+   "id": "radio:takeoff",
+   "file": "radio_takeoff.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 18.233,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 18.767,
+   "id": "line:court:0",
+   "file": "line_court_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 20.033,
+   "id": "radio:armDown",
+   "file": "radio_armDown.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 22.267,
+   "id": "line:court:1",
+   "file": "line_court_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 25.267,
+   "id": "line:court:2",
+   "file": "line_court_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 28.667,
+   "id": "line:court:3",
+   "file": "line_court_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 31.6,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 31.6,
+   "id": "radio:landing",
+   "file": "radio_landing.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 35.867,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 40.033,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 41.167,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 43.133,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

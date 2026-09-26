@@ -1,0 +1,150 @@
+{
+ "name": "court_2",
+ "scene": "court",
+ "sceneName": "Basketball",
+ "cmd": 2,
+ "say": "Drone straight down, top view.",
+ "dur": 52.03,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 30.8
+  },
+  {
+   "name": "Edit",
+   "t": 34.03
+  },
+  {
+   "name": "Post",
+   "t": 39.33
+  },
+  {
+   "name": "Seen",
+   "t": 41
+  }
+ ],
+ "seen": 41.000000000000234,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:court:2",
+   "file": "cmd_court_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 2.467,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 3.3,
+   "id": "shot:A:side",
+   "file": "shot_A_side.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 4.933,
+   "id": "shot:B:baseline",
+   "file": "shot_B_baseline.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 6.567,
+   "id": "shot:C:corner",
+   "file": "shot_C_corner.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 8,
+   "id": "drone:overhead",
+   "file": "drone_overhead.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 10.2,
+   "id": "radio:takeoff",
+   "file": "radio_takeoff.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 16.4,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 16.933,
+   "id": "line:court:0",
+   "file": "line_court_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 18.2,
+   "id": "radio:armDown",
+   "file": "radio_armDown.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 20.433,
+   "id": "line:court:1",
+   "file": "line_court_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 23.433,
+   "id": "line:court:2",
+   "file": "line_court_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 26.833,
+   "id": "line:court:3",
+   "file": "line_court_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 29.767,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 29.767,
+   "id": "radio:landing",
+   "file": "radio_landing.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 34.033,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 38.2,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 39.333,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 41,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

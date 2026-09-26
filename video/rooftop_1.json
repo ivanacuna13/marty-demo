@@ -1,0 +1,144 @@
+{
+ "name": "rooftop_1",
+ "scene": "rooftop",
+ "sceneName": "Rooftop story",
+ "cmd": 1,
+ "say": "Silhouette me against the skyline.",
+ "dur": 53.67,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 31.93
+  },
+  {
+   "name": "Edit",
+   "t": 35.67
+  },
+  {
+   "name": "Post",
+   "t": 40.97
+  },
+  {
+   "name": "Seen",
+   "t": 42.63
+  }
+ ],
+ "seen": 42.633333333333475,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:rooftop:1",
+   "file": "cmd_rooftop_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 2.8,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 3.633,
+   "id": "shot:A:MS",
+   "file": "shot_A_MS.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 5.033,
+   "id": "shot:B:CU",
+   "file": "shot_B_CU.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 6.6,
+   "id": "shot:C:silhouette",
+   "file": "shot_C_silhouette.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 8.133,
+   "id": "drone:pullout",
+   "file": "drone_pullout.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 10.267,
+   "id": "radio:takeoff",
+   "file": "radio_takeoff.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 14.967,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 15.5,
+   "id": "line:rooftop:0",
+   "file": "line_rooftop_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 19.2,
+   "id": "line:rooftop:1",
+   "file": "line_rooftop_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 23.2,
+   "id": "line:rooftop:2",
+   "file": "line_rooftop_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 27,
+   "id": "line:rooftop:3",
+   "file": "line_rooftop_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 30.9,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 30.9,
+   "id": "radio:landing",
+   "file": "radio_landing.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 35.667,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 39.833,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 40.967,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 42.633,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

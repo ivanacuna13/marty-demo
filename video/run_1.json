@@ -1,0 +1,150 @@
+{
+ "name": "run_1",
+ "scene": "run",
+ "sceneName": "Morning run",
+ "cmd": 1,
+ "say": "Low and fast. Get the ground-level shot.",
+ "dur": 53.47,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 32.13
+  },
+  {
+   "name": "Edit",
+   "t": 35.47
+  },
+  {
+   "name": "Post",
+   "t": 40.77
+  },
+  {
+   "name": "Seen",
+   "t": 42.43
+  }
+ ],
+ "seen": 42.433333333333486,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:run:1",
+   "file": "cmd_run_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 3.133,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 3.967,
+   "id": "shot:A:lead",
+   "file": "shot_A_lead.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 5.267,
+   "id": "shot:B:low",
+   "file": "shot_B_low.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 7.033,
+   "id": "shot:C:trail",
+   "file": "shot_C_trail.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 8.667,
+   "id": "drone:chase",
+   "file": "drone_chase.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 10.767,
+   "id": "radio:takeoff",
+   "file": "radio_takeoff.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 17.133,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 17.667,
+   "id": "line:run:0",
+   "file": "line_run_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 18.533,
+   "id": "radio:armDown",
+   "file": "radio_armDown.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 21.367,
+   "id": "line:run:1",
+   "file": "line_run_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 24.567,
+   "id": "line:run:2",
+   "file": "line_run_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 27.567,
+   "id": "line:run:3",
+   "file": "line_run_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 31.1,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 31.1,
+   "id": "radio:landing",
+   "file": "radio_landing.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 35.467,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 39.633,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 40.767,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 42.433,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}

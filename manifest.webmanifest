@@ -1,0 +1,17 @@
+{
+  "name": "Marty Fleet Sim",
+  "short_name": "Marty",
+  "description": "Three camera robots and a drone film a shoot; the cloud edits it; a viewer watches the post.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#0e1113",
+  "theme_color": "#111416",
+  "icons": [
+    { "src": "img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "img/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

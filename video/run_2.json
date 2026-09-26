@@ -1,0 +1,126 @@
+{
+ "name": "run_2",
+ "scene": "run",
+ "sceneName": "Morning run",
+ "cmd": 2,
+ "say": "Drone only, high and wide.",
+ "dur": 43,
+ "fps": 30,
+ "w": 1280,
+ "h": 720,
+ "chapters": [
+  {
+   "name": "Shoot",
+   "t": 0
+  },
+  {
+   "name": "Upload",
+   "t": 22.93
+  },
+  {
+   "name": "Edit",
+   "t": 25
+  },
+  {
+   "name": "Post",
+   "t": 30.3
+  },
+  {
+   "name": "Seen",
+   "t": 31.97
+  }
+ ],
+ "seen": 31.966666666667415,
+ "audio": [
+  {
+   "t": 0,
+   "id": "cmd:run:2",
+   "file": "cmd_run_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 2.433,
+   "id": "radio:copy",
+   "file": "radio_copy.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 3.267,
+   "id": "drone:follow",
+   "file": "drone_follow.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 5.533,
+   "id": "radio:takeoff",
+   "file": "radio_takeoff.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 7.933,
+   "id": "radio:rolling",
+   "file": "radio_rolling.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 8.467,
+   "id": "line:run:0",
+   "file": "line_run_0.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 12.167,
+   "id": "line:run:1",
+   "file": "line_run_1.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 15.367,
+   "id": "line:run:2",
+   "file": "line_run_2.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 18.367,
+   "id": "line:run:3",
+   "file": "line_run_3.m4a",
+   "ch": "dialogue"
+  },
+  {
+   "t": 21.9,
+   "id": "radio:wrap",
+   "file": "radio_wrap.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 21.9,
+   "id": "radio:landing",
+   "file": "radio_landing.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 25,
+   "id": "radio:verified",
+   "file": "radio_verified.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 29.167,
+   "id": "radio:editReady",
+   "file": "radio_editReady.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 30.3,
+   "id": "radio:approved",
+   "file": "radio_approved.m4a",
+   "ch": "radio"
+  },
+  {
+   "t": 31.967,
+   "id": "radio:posted",
+   "file": "radio_posted.m4a",
+   "ch": "radio"
+  }
+ ]
+}
