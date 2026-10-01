@@ -1,0 +1,11 @@
+{
+  "name": "Axel Guitar Coach",
+  "short_name": "Axel",
+  "description": "An AI guitar teacher that hears you, sees your hands and talks back.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d0b09",
+  "theme_color": "#0d0b09",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

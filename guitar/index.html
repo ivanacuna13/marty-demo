@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Axel Guitar Coach</title>
+<meta name="description" content="An AI guitar teacher that hears you, sees your hands and talks back. 80/20 lessons, songs you love, and a Rocky training camp.">
+<meta name="theme-color" content="#0d0b09">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <a class="brand" href="#/"><span class="pick">A</span><span><b>AXEL</b><small>guitar coach</small></span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#/"><span>🏠</span>Today</a>
+      <a href="#/path"><span>🗺</span>Path</a>
+      <a href="#/library"><span>📚</span>Library</a>
+      <a href="#/rocky" class="rocky-link"><span>🥊</span>Rocky</a>
+      <a href="#/decoder"><span>🧠</span>Decoder</a>
+      <a href="#/chords"><span>✋</span>Chords</a>
+      <a href="#/tuner"><span>🎚</span>Tuner</a>
+      <a href="#/camera"><span>📷</span>Camera</a>
+      <a href="#/progress"><span>📈</span>Progress</a>
+      <a href="#/method"><span>🔬</span>Method</a>
+      <a href="#/settings"><span>⚙️</span>Settings</a>
+    </nav>
+    <p class="side-foot">Hi <b id="hello">champ</b> 👊</p>
+  </aside>
+  <div class="main">
+    <div class="topbar" id="sensors" aria-label="Sensors"></div>
+    <main id="view" tabindex="-1"></main>
+  </div>
+</div>
+<div id="dock" class="dock"></div>
+<div id="toasts" class="toasts"></div>
+<noscript>Axel needs JavaScript to hear and see you.</noscript>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
