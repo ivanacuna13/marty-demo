@@ -6,6 +6,7 @@ import { metronome, setVolume } from './synth.js';
 import { h, toast, modal, stars } from './ui.js';
 import { lessonById } from './lessons.js';
 import { allSongs, playable } from './songs.js';
+import { IS_ARTIFACT, cap } from './platform.js';
 
 export async function progressView(root) {
   const st = store.get();
@@ -56,9 +57,10 @@ export async function settingsView(root, _, app) {
       field('Voice', bind(voices, 'settings.voice')),
       field('Speed', bind(h('input', { type: 'range', min: 0.7, max: 1.4, step: 0.05, value: s.rate }), 'settings.rate', Number)),
       field('How much he talks', bind(h('select', {}, ...[[0, 'Silent (text only)'], [1, 'Just results'], [2, 'Full coaching'], [3, 'Hype man']].map(([v, l]) => h('option', { value: v, selected: +v === +s.talkative || undefined }, l))), 'settings.talkative', Number)),
-      h('label', { class: 'switch' }, bind(h('input', { type: 'checkbox', checked: s.wakeWord || undefined }), 'settings.wakeWord'), ' Wake word: only respond after "Axel…"'),
+      IS_ARTIFACT ? null : h('label', { class: 'switch' }, bind(h('input', { type: 'checkbox', checked: s.wakeWord || undefined }), 'settings.wakeWord'), ' Wake word: only respond after "Axel…"'),
       h('button', { class: 'btn ghost', onclick: () => coach.say("Yo! This is how I sound. Now go get that G chord ringing.") }, '🔊 Test voice')),
     h('div', { class: 'card stack' }, h('h3', {}, 'Ears & timing'), field('Strum detection sensitivity', sens), field('Metronome volume', mvol), calib),
+    IS_ARTIFACT ? h('div', { class: 'card stack' }, h('h3', {}, "🧠 Axel's brain"), h('p', {}, 'Built in. Axel uses Claude through your own Claude plan; the first time he thinks, Claude asks for your permission. No API keys needed here, and your progress syncs to your Claude account.')) :
     h('div', { class: 'card stack' }, h('h3', {}, '🧠 Superpowers (optional API keys)'),
       h('p', { class: 'muted small' }, 'Keys are stored only in this browser (localStorage) and sent only to that provider, straight from your browser. Use a key with a spending limit, and don\'t use these on a shared computer.'),
       field('Claude API key: full conversation, song charts on demand, coaching that reads your live sensor data', bind(h('input', { type: 'password', value: s.claudeKey, placeholder: 'sk-ant-…', autocomplete: 'off' }), 'settings.claudeKey', v => v.trim()), h('a', { href: 'https://console.anthropic.com/settings/keys', target: '_blank', rel: 'noopener' }, 'Get a key at console.anthropic.com')),
@@ -66,7 +68,11 @@ export async function settingsView(root, _, app) {
       field('ElevenLabs voice ID', bind(h('input', { type: 'text', value: s.elevenVoice, placeholder: 'leave blank for default' }), 'settings.elevenVoice', v => v.trim()))),
     h('div', { class: 'card stack' }, h('h3', {}, 'Your data'),
       h('div', { class: 'row wrap' },
-        h('button', { class: 'btn ghost', onclick: () => { const st2 = { ...store.get(), settings: { ...store.get().settings, claudeKey: '', elevenKey: '' } }; const a = h('a', { href: URL.createObjectURL(new Blob([JSON.stringify(st2, null, 1)], { type: 'application/json' })), download: 'axel-progress.json' }); a.click(); } }, '⬇ Export progress'),
+        h('button', { class: 'btn ghost', onclick: async () => {
+          const st2 = { ...store.get(), settings: { ...store.get().settings, claudeKey: '', elevenKey: '' } }; const json = JSON.stringify(st2, null, 1);
+          if (IS_ARTIFACT) { const dl = await cap('downloads'); if (!dl) { toast('Downloads are not available in this view.', 'bad'); return; } dl.save({ filename: 'axel-progress.json', data: json }).then(() => toast('Saved', 'good')).catch(e => { if (e?.code !== 'declined') toast('Could not save the file.', 'bad'); }); return; }
+          const a = h('a', { href: URL.createObjectURL(new Blob([json], { type: 'application/json' })), download: 'axel-progress.json' }); a.click();
+        } }, '⬇ Export progress'),
         h('label', { class: 'btn ghost' }, '⬆ Import progress', h('input', { type: 'file', accept: 'application/json', hidden: true, onchange: async e => { try { const d = JSON.parse(await e.target.files[0].text()); const keep = store.get().settings; Object.assign(store.get(), d, { settings: { ...d.settings, claudeKey: keep.claudeKey, elevenKey: keep.elevenKey } }); store.save(); toast('Progress imported', 'good'); } catch (err) { toast('Bad file', 'bad'); } } })),
         h('button', { class: 'btn danger', onclick: () => modal('Reset everything?', h('p', {}, 'This erases your progress, songs and settings on this device.'), [['Erase', () => { store.reset(); location.hash = '#/'; location.reload(); }, 'danger'], ['Cancel', () => {}]]) }, 'Reset'))));
 }

@@ -66,9 +66,18 @@ export class Ears extends EventTarget {
     // Worklet must be pulled by the graph; route through a muted gain.
     const mute = this.ctx.createGain(); mute.gain.value = 0; this.onsetNode.connect(mute); mute.connect(this.ctx.destination);
   }
+  // Analyze a playing <audio>/<video> element (uploaded recordings) instead of the mic; you still hear it.
+  async listenTo(el) {
+    await this.ensureContext();
+    if (this.running) this.stop();
+    el._axelSrc ||= this.ctx.createMediaElementSource(el);
+    el._axelSrc.connect(this.ctx.destination);
+    this.attach(el._axelSrc);
+    this.fromFile = el;
+  }
   setSensitivity(v) { this.sensitivity = v; this.onsetNode?.port.postMessage({ sensitivity: v }); }
   stop() {
-    this.running = false; cancelAnimationFrame(this._raf);
+    this.running = false; this.fromFile = null; cancelAnimationFrame(this._raf);
     this.stream?.getTracks().forEach(t => t.stop()); this.stream = null;
     try { this.src?.disconnect(); } catch (e) {}
   }

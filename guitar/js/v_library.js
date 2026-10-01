@@ -1,6 +1,7 @@
 // Library (your taste → your songs), the Song Player (play-along with live bar-by-bar scoring), and the chord-sheet importer.
 import * as store from './store.js';
-import { ears } from './audio.js';
+import { ears, analyzeBuffer, framesToChords } from './audio.js';
+import { IS_ARTIFACT } from './platform.js';
 import { coach } from './coach.js';
 import { metronome, strum, playNote } from './synth.js';
 import { h, chordEl, toast, modal, stars } from './ui.js';
@@ -186,14 +187,14 @@ export async function songView(root, [id, mode], app) {
   const tempoLbl = h('b', {}, '');
   const updTempo = () => { tempoPct = +tempoIn.value; tempoLbl.textContent = `${tempoPct}% · ${Math.round((s.bpm || 90) * tempoPct / 100)} bpm`; if (playing) metronome.setBpm((s.bpm || 90) * tempoPct / 100); };
   tempoIn.oninput = updTempo; updTempo();
-  const backing = h('input', { type: 'checkbox', checked: true }); const scoring = h('input', { type: 'checkbox', checked: true }); const clickOn = h('input', { type: 'checkbox', checked: true });
+  const backing = h('input', { type: 'checkbox', checked: true, id: 'backing' }); const scoring = h('input', { type: 'checkbox', checked: !IS_ARTIFACT || undefined, id: 'scoring' }); const clickOn = h('input', { type: 'checkbox', checked: true });
   const playBtn = h('button', { class: 'btn big' }, '▶ Play along');
   const nowEl = h('div', { class: 'now-next' });
   const summary = h('div', { class: 'result', hidden: true });
   root.append(h('div', { class: 'card transport sticky' },
     h('div', { class: 'row wrap' }, playBtn, h('label', { class: 'tempo' }, 'Tempo ', tempoIn, tempoLbl)),
-    h('div', { class: 'row wrap small' }, h('label', { class: 'switch' }, backing, ' Axel plays along'), h('label', { class: 'switch' }, scoring, ' Listen & score me'), h('label', { class: 'switch' }, clickOn, ' Click'), h('span', { class: 'muted' }, '🎧 Headphones help scoring when Axel plays along. Click a section\'s ⟲ to loop it.')),
-    nowEl), h('h2', { class: 'group-title' }, 'Chart'), sectionsEl, summary);
+    h('div', { class: 'row wrap small' }, h('label', { class: 'switch' }, backing, ' Axel plays along'), h('label', { class: 'switch' }, scoring, IS_ARTIFACT ? ' Score live (via 🎧 Listen)' : ' Listen & score me'), h('label', { class: 'switch' }, clickOn, ' Click'), h('span', { class: 'muted' }, '🎧 Headphones help scoring when Axel plays along. Click a section\'s ⟲ to loop it.')),
+    nowEl), takeCard(s, app), h('h2', { class: 'group-title' }, 'Chart'), sectionsEl, summary);
 
   const setLoop = (si, extend) => {
     const first = timeline.findIndex(t => t.si === si), last = timeline.length - 1 - [...timeline].reverse().findIndex(t => t.si === si);
@@ -298,4 +299,56 @@ export async function songView(root, [id, mode], app) {
   ears.addEventListener('frame', onFrame);
   showNowNext(0);
   return () => { stop(); ears.removeEventListener('frame', onFrame); };
+}
+
+// Grade a recording: record yourself playing the song (any phone voice memo or video), upload it, and Axel compares
+// the chords he hears with the chart, in order, regardless of where you started.
+function takeCard(s, app) {
+  const inp = h('input', { type: 'file', accept: 'audio/*,video/*', hidden: true, id: 'takeFile' });
+  const prog = h('progress', { max: 1, value: 0, hidden: true });
+  const out = h('div', {});
+  const btn = h('button', { class: 'btn ghost', onclick: () => inp.click() }, '📼 Grade a recording');
+  inp.onchange = async () => {
+    const f = inp.files[0]; if (!f) return;
+    btn.disabled = true; prog.hidden = false; out.textContent = 'Listening to your take…';
+    try { renderTake(out, s, await gradeTake(s, f, p => { prog.value = p; })); }
+    catch (e) { out.textContent = 'Could not read that file: ' + (e.message || e); }
+    finally { btn.disabled = false; prog.hidden = true; inp.value = ''; }
+  };
+  return h('div', { class: 'card take' }, h('div', { class: 'row wrap' }, h('div', { class: 'take-text' }, h('h3', {}, 'Grade a recording'), h('p', { class: 'muted small' }, 'Record yourself playing this song on your phone (voice memo or video), then load it. Axel checks the chord changes you played against the chart.')), btn, inp, prog), out);
+}
+const mergeRuns = arr => arr.filter((x, i) => x && x !== arr[i - 1]);
+function lcs(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, () => new Uint16Array(b.length + 1));
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] + 1 : Math.max(dp[i - 1][j], dp[i][j - 1]);
+  return dp[a.length][b.length];
+}
+export async function gradeTake(s, file, onProgress) {
+  const ac = await ears.ensureContext();
+  const buf = await ac.decodeAudioData(await file.arrayBuffer());
+  const res = await analyzeBuffer(buf, { onProgress });
+  const chords = songChords(s);
+  const heard = framesToChords(res.frames, res.tempo, { beatsPerChord: 2, candidates: chords });
+  const got = mergeRuns(heard.map(c => c.name));
+  const expected = mergeRuns((s.sections || []).flatMap(sec => Array.from({ length: sec.repeat || 1 }, () => sec.bars.flatMap(b => b.split(/\s+/)))).flat());
+  const m = lcs(expected.slice(0, Math.max(got.length * 2, 8)), got);
+  const p = got.length ? m / got.length : 0, r = m / Math.max(1, Math.min(expected.length, got.length));
+  const score = p + r ? 2 * p * r / (p + r) : 0;
+  const share = list => { const c = {}; list.forEach(x => { c[x] = (c[x] || 0) + 1; }); Object.keys(c).forEach(k => { c[k] /= list.length || 1; }); return c; };
+  const es = share(expected), gs = share(got);
+  const weak = chords.filter(c => (es[c] || 0) > 0.08 && (gs[c] || 0) < (es[c] || 0) * 0.45);
+  return { score, got, expected, weak, tempo: res.tempo, duration: buf.duration, heard };
+}
+function renderTake(out, s, r) {
+  const pct = Math.round(r.score * 100);
+  store.record('song:' + s.id, r.score, { take: true });
+  const target = s.bpm || 90;
+  const tempoMsg = Math.abs(r.tempo - target) <= 8 ? `You were right around the song's tempo (~${r.tempo} bpm).` : r.tempo < target ? `Your tempo was about ${r.tempo} bpm, slower than the record's ~${target}. Perfect for learning; creep it up 5 bpm at a time.` : `Your tempo came out around ${r.tempo} bpm, faster than the record's ~${target}. Rein it in so the changes stay clean.`;
+  const msg = `${pct}% of your chord changes matched the chart. ${r.weak.length ? `I barely heard ${r.weak.map(prettyChord).join(' and ')}: those changes are the ones to drill.` : 'Every chord in the song showed up.'} ${tempoMsg}`;
+  out.innerHTML = '';
+  out.append(h('div', { class: 'result-card ' + (pct >= 85 ? 'good' : pct >= 60 ? 'mid' : 'bad') }, h('div', { class: 'big' }, pct + '%'), h('p', {}, msg),
+    h('div', { class: 'chord-lane' }, ...r.heard.map(c => h('span', { class: 'lane-chord' + (c.name ? '' : ' none'), style: { flexGrow: Math.max(1, c.end - c.t) } }, c.name ? prettyChord(c.name) : '·'))),
+    h('small', { class: 'muted' }, 'What I heard, left to right. Chord detection on a phone recording is approximate; strum clearly and keep background noise down.'),
+    r.weak.length >= 2 ? h('div', { class: 'row' }, h('a', { class: 'btn ghost', href: '#/lesson/' + encodeURIComponent(`change:${r.weak[0]}-${r.weak[1]}`) }, `Drill ${prettyChord(r.weak[0])} ↔ ${prettyChord(r.weak[1])}`)) : null));
+  coach.say(msg);
 }

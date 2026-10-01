@@ -6,6 +6,7 @@ import { strum, arpeggio, playNote } from './synth.js';
 import { h, chordEl, tabEl, toast, fmtTime } from './ui.js';
 import { notesToTab, renderAsciiTab, prettyChord, midiName, normalize, STANDARD } from './theory.js';
 import { SONGS } from './songs.js';
+import { IS_ARTIFACT } from './platform.js';
 
 const MONTAGE = [
   { day: 1, title: 'Roadwork: the cinematic minor loop', what: 'Am → F → C → G, slow arpeggios (bass-3-2-1). This is the mood engine of the ballad.', go: '#/song/gym-minor-cinema' },
@@ -92,18 +93,19 @@ export async function decoderView(root, _, app) {
   root.append(
     h('header', { class: 'page-head' }, h('h1', {}, 'Song Decoder'), h('p', {}, 'Learn any song you love by ear, with superpowers. Load a track you own. Axel finds the tempo, key, chord changes and a melody draft, maps the melody to tab, and lets you slow it down and loop it without changing the pitch. Everything runs on your device; nothing is uploaded.')),
     h('div', { class: 'card' }, h('div', { class: 'row wrap' }, file, prog), h('div', { class: 'row wrap' }, audio, h('label', { class: 'tempo' }, 'Speed ', speed, speedL), abBtn)),
-    h('div', { class: 'card row' }, h('div', {}, h('h3', {}, '🎧 Live chord ears'), h('p', { class: 'muted' }, 'Play anything near your mic (YouTube on speakers, a band, yourself). Axel names chords in real time.')), live),
+    h('div', { class: 'card row' }, h('div', {}, h('h3', {}, '🎧 Live chord ears'), h('p', { class: 'muted' }, IS_ARTIFACT ? 'Press play on the track above: Axel names each chord in real time as it goes by. Slow it down to catch fast changes.' : 'Play anything near your mic (YouTube on speakers, a band, yourself). Axel names chords in real time.')), live),
     out);
   // Live chord readout (mic)
   let liveOn = false;
   live.onclick = async () => { liveOn = await app.micOn(); };
   const onFrame = () => { const c = ears.chord; live.textContent = c && c.score > 0.78 ? prettyChord(c.name) : '…'; };
   ears.addEventListener('frame', onFrame);
-  app.micOn();
+  if (!IS_ARTIFACT) app.micOn();
 
   file.onchange = async () => {
     const f = file.files[0]; if (!f) return;
     audio.src = URL.createObjectURL(f); audio.playbackRate = +speed.value;
+    if (IS_ARTIFACT || !ears.running) ears.listenTo(audio).catch(() => {});
     out.innerHTML = ''; prog.hidden = false; prog.value = 0;
     try {
       const ac = await ears.ensureContext();
@@ -162,5 +164,5 @@ export async function decoderView(root, _, app) {
     }
     coach.say(`Got it. Around ${bpm} bpm, probably ${key.name}. ${capo?.capo ? `Capo ${capo.capo} with ${capo.shape} shapes will make it easy.` : ''} Tap any chord to jump there.`);
   }
-  return () => { ears.removeEventListener('frame', onFrame); audio.pause(); };
+  return () => { ears.removeEventListener('frame', onFrame); audio.pause(); if (ears.fromFile === audio) ears.stop(); };
 }

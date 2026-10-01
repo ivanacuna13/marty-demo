@@ -4,6 +4,7 @@ import { coach } from './coach.js';
 import { h, avatarEl, stars } from './ui.js';
 import { STAGES, planToday, ALL_LESSONS } from './lessons.js';
 import { allSongs, playable } from './songs.js';
+import { IS_ARTIFACT } from './platform.js';
 
 const ICON = { tune: '🎚', posture: '📷', chord: '✋', change: '⇄', strum: '↕', riff: '🎯', song: '🎸', ear: '👂', link: '🧠' };
 
@@ -34,9 +35,15 @@ export async function homeView(root, _, app) {
           tile('#/tuner', '🎚', 'Tuner'), tile('#/camera', '📷', 'Camera Coach'), tile('#/decoder', '🧠', 'Song Decoder'), tile('#/chords', '✋', 'Chord Finder'), tile('#/library', '📚', 'Library'), tile('#/method', '🔬', 'The Method')))),
     h('div', { class: 'card howto' }, h('h3', {}, 'How Axel coaches you'),
       h('div', { class: 'grid3' },
-        feat('👂 Ears', 'Hears every note and chord through your mic. He tells you which string is dead, scores your timing to the millisecond, and counts your chord changes.'),
-        feat('👀 Eyes', 'Hand tracking checks finger arch and wrist angle, and follows your strumming hand. Thumbs-up = next, open palm = stop.'),
-        feat('🗣 Voice', 'Say "Axel, show me F", "slower", "next", "open Wonderwall". With a Claude key he can talk about anything guitar.'),
+        ...(IS_ARTIFACT ? [
+          feat('🎧 Ears', 'Load a voice memo or video of yourself playing and Axel hears every chord and strum: he grades your take against the song chart and your timing against the tempo.'),
+          feat('📼 Eyes', 'Load a phone video and hand tracking checks finger arch and wrist angle and follows your strumming hand. Or snap one photo for a chord-shape check.'),
+          feat('🗣 Voice', 'Ask anything in the coach box: "show me F", "add Tennessee Whiskey", "what should I practice?". He answers out loud with Claude built in.'),
+        ] : [
+          feat('👂 Ears', 'Hears every note and chord through your mic. He tells you which string is dead, scores your timing to the millisecond, and counts your chord changes.'),
+          feat('👀 Eyes', 'Hand tracking checks finger arch and wrist angle, and follows your strumming hand. Thumbs-up = next, open palm = stop.'),
+          feat('🗣 Voice', 'Say "Axel, show me F", "slower", "next", "open Wonderwall". With a Claude key he can talk about anything guitar.'),
+        ]),
         feat('📈 Brain', 'Spaced repetition, a ~85% success sweet spot, and tempo that ramps itself. Short daily sessions, because sleep locks in skill.'))));
   face.look(0.4, 0.1);
   if (!st.profile.name) setTimeout(() => onboarding(app), 400);
@@ -60,7 +67,7 @@ function onboarding(app) {
       if (level.value !== 'beginner') ['G', 'C', 'D', 'Em', 'Am'].forEach(c => { st.skills['chord:' + c] = { level: level.value === 'intermediate' ? 3 : 2, ease: 2.5, interval: 3, due: Date.now() + 2 * 864e5, best: 0.9, history: [] }; });
       if (level.value === 'intermediate') st.stage = 2;
       store.save(); el.remove(); document.getElementById('hello').textContent = st.profile.name;
-      coach.say(`Welcome to camp, ${st.profile.name}. ${st.profile.minutesPerDay} minutes a day is plenty. Turn on my ears and let's tune up.`);
+      coach.say(`Welcome to camp, ${st.profile.name}. ${st.profile.minutesPerDay} minutes a day is plenty. ${IS_ARTIFACT ? "Let's tune up." : "Turn on my ears and let's tune up."}`);
       app.go('#/');
     } }, "Let's go")));
   document.querySelector('#view').prepend(el);

@@ -2,6 +2,7 @@
   --bg: #0d0b09; --bg2: #15120e; --card: #1b1712; --card2: #231e17; --line: #352d22; --text: #f4ece0; --muted: #a8998a;
   --gold: #ffb020; --gold2: #ffcf6b; --red: #e0283f; --teal: #36d6c3; --good: #3ddc84; --mid: #ffb020; --bad: #ff5a5a;
   --r: 16px; --shadow: 0 10px 30px rgba(0,0,0,.35);
+  color-scheme: dark;
   --display: 'Anton', Impact, 'Arial Narrow', sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
@@ -218,7 +219,7 @@ progress { width: 200px; accent-color: var(--gold); }
 .skills { width: 100%; border-collapse: collapse; font-size: 13.5px; } .skills th, .skills td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--line); } .skills .stars { color: var(--gold); letter-spacing: -1px; }
 
 /* coach dock */
-.dock { position: fixed; right: 18px; bottom: 18px; z-index: 50; display: flex; gap: 10px; align-items: flex-end; width: min(460px, calc(100vw - 36px)); padding: 10px; background: rgba(27,23,18,.96); border: 1px solid #4b3a1a; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,.55); backdrop-filter: blur(8px); }
+.dock { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 50; display: flex; gap: 10px; align-items: flex-end; width: min(460px, calc(100vw - 36px)); padding: 10px; background: rgba(27,23,18,.96); border: 1px solid #4b3a1a; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,.55); backdrop-filter: blur(8px); }
 .dock-face { flex: none; color: var(--gold); cursor: pointer; } .dock-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .bubble { background: var(--card2); border-radius: 14px 14px 14px 4px; padding: 9px 12px; font-size: 14px; max-height: 120px; overflow-y: auto; }
 .heard-line { font-size: 12px; color: var(--muted); min-height: 1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -262,3 +263,21 @@ progress { width: 200px; accent-color: var(--gold); }
   .metro-wrap { margin-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* recordings & photos (Claude artifact mode) */
+.cam-stage canvas { pointer-events: none; }
+.cam-stage.file video, .cam-stage.file canvas { transform: none; object-fit: contain; }
+.cam-stage.file { background: #000; }
+.file-player { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 45; display: flex; gap: 8px; align-items: center; background: var(--card2); border: 1px solid var(--gold); border-radius: 14px; padding: 6px 10px; box-shadow: var(--shadow); max-width: calc(100vw - 32px); }
+.file-player small { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.file-player audio { height: 34px; min-width: 0; }
+.self-check { border-color: #4b3a1a; }
+.photo-check { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.take .take-text { flex: 1; min-width: 0; }
+.talk.send { font-size: 16px; }
+@media (max-width: 860px) {
+  .side { padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .file-player { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
+}
+html.in-artifact .shell { min-height: 100%; }
+html.in-artifact .side { height: 100vh; }

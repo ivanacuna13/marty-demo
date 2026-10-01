@@ -19,6 +19,16 @@ Optional superpowers (Settings → stored only in your browser):
 - **Claude API key**: free conversation, live coaching from sensor data, and charts built on demand for any song, including whole playlists.
 - **ElevenLabs key**: a studio-quality voice for Axel. Without it, the browser's built-in voice is used.
 
+## Claude artifact version
+`artifact.html` is the same app published as a Claude artifact. Inside Claude, pages can't use the live camera, mic or speech input, so the app switches modes automatically (`js/platform.js`):
+- **Ears:** 🎧 Listen plays an uploaded recording through the same analyzer; songs have "Grade a recording"; the Decoder names chords live as a track plays.
+- **Eyes:** Video Coach runs hand tracking on an uploaded phone video. Photo check sends one photo of your chord hand to Claude.
+- **Brain:** the built-in Claude (`sample`) with the same app-control tools; no API key.
+- **Progress:** synced to the viewer's account (`db`, private per person). Export uses `downloads`.
+- **Drills** without live audio fall back to an honest self-rating, so spaced repetition keeps working.
+
+The MediaPipe engine and model are published as supporting files: the model as base64 text, because artifacts only serve web file types. They come from `@mediapipe/tasks-vision@0.10.14` and the official `hand_landmarker.task`.
+
 ## What's inside
 
 | Sense | How | Used for |

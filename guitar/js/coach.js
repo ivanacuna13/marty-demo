@@ -4,6 +4,7 @@ import * as store from './store.js';
 import { getShape, STRING_LABELS } from './theory.js';
 import { FIXES } from './lessons.js';
 import { allSongs } from './songs.js';
+import { IS_ARTIFACT, cap } from './platform.js';
 
 export const PERSONA = `You are Axel, an elite guitar coach living inside a web app. Your personality is a gritty boxing trainer crossed with the warmest, most patient guitar teacher alive. Think Rocky's corner man who also happens to be a world-class musician. You are hype, direct and funny, and never condescending.
 
@@ -91,7 +92,7 @@ class Coach extends EventTarget {
       a.play().catch(() => { clearInterval(tick); this._speaking(false); res(); });
     });
   }
-  stopSpeaking() { this.synth?.cancel(); if (this._audio) { this._audio.pause(); this._audio = null; } this._speaking(false); }
+  stopSpeaking() { this._ctl?.abort(); this.synth?.cancel(); if (this._audio) { this._audio.pause(); this._audio = null; } this._speaking(false); }
   _speaking(v) { this.speaking = v; this.dispatchEvent(new CustomEvent('speaking', { detail: v })); if (!v) setTimeout(() => this._resumeRec(), 350); }
 
   // ---------- EARS FOR SPEECH (voice commands) ----------
@@ -130,7 +131,9 @@ class Coach extends EventTarget {
     if (quick) return;
     const key = store.get().settings.claudeKey;
     try {
-      if (key) return await this._claude(text, key);
+      const sample = IS_ARTIFACT && !this._sampleOff ? await cap('sample') : null;
+      if (sample) { const r = await this._sample(text, sample); if (r !== 'fallback') return; }
+      else if (key) return await this._claude(text, key);
     } catch (e) {
       console.error(e);
       this.dispatchEvent(new CustomEvent('note', { detail: 'Claude brain error: ' + (e.message || e) + '. Using the offline brain.' }));
@@ -190,6 +193,37 @@ class Coach extends EventTarget {
     }
     this.dispatchEvent(new CustomEvent('reply', { detail: { text: reply, done: true } }));
     if (reply.trim()) await this.say(reply.trim(), { interrupt: false });
+  }
+  // Inside a Claude artifact: the built-in Claude (viewer's own plan, asks permission once), same tools, no API key.
+  async _sample(text, sample) {
+    this.turns ||= [];
+    this.turns.push({ role: 'user', content: `[live app context]\n${JSON.stringify(this.context())}\n\n${text}` });
+    while (this.turns.length > 14 || this.turns[0]?.role !== 'user') this.turns.shift();
+    const rules = PERSONA + `\n\nYou are running inside a Claude artifact. Live camera, microphone and speech input are unavailable here, so sensor fields may read "off". The student can still upload a recording (Camera Coach, Song Decoder, "Grade a recording" on a song) or a photo of their chord hand ("Photo check") for you to review. Reply in plain sentences, briefly.`;
+    const lim = await sample.limits().catch(() => null);
+    const tools = lim?.tools && !this._noTools ? TOOLS.slice(0, lim.tools.maxCount).map(t => ({
+      name: t.name, description: t.description, inputSchema: t.input_schema,
+      execute: async input => { const r = await this._runTool({ id: 't', name: t.name, input }); if (r.is_error) throw new Error(r.content); return r.content; },
+    })) : undefined;
+    const heavy = /\b(add|playlist|chart|library|songs?\b.*\b(love|like))/i.test(text);
+    const ctl = new AbortController(); this._ctl = ctl;
+    this.dispatchEvent(new CustomEvent('reply', { detail: { text: 'Thinking…', done: false } }));
+    try {
+      const { text: out, truncated } = await sample([{ role: 'user', content: rules }, ...this.turns], {
+        cache: false, tools, modelTier: heavy ? 'default' : 'quick', signal: ctl.signal,
+        onText: ({ text: t }) => this.dispatchEvent(new CustomEvent('reply', { detail: { text: t, done: false } })),
+      });
+      this.turns.push({ role: 'assistant', content: out });
+      this.dispatchEvent(new CustomEvent('reply', { detail: { text: out + (truncated ? ' …' : ''), done: true } }));
+      await this.say(out, { interrupt: false });
+    } catch (e) {
+      const code = e?.code;
+      if (code === 'cancelled') { this.dispatchEvent(new CustomEvent('reply', { detail: { text: e.text || 'Stopped.', done: true } })); return; }
+      if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(code)) { this._sampleOff = true; this.dispatchEvent(new CustomEvent('note', { detail: 'Claude is off for this page, so Axel is using his offline brain.' })); return 'fallback'; }
+      if (code === 'tools_unavailable' && !this._noTools) { this._noTools = true; this.turns.pop(); return this._sample(text, sample); }
+      const msg = code === 'rate_limited' ? "I'm out of breath. Too many questions at once; try again in a minute." : code === 'session_expired' ? 'Your Claude session expired. Sign in again and ask me once more.' : code === 'refused' ? "Let's keep it on guitar. What do you want to play?" : (e.text ? e.text + ' …(cut off)' : 'I lost the connection. Ask me again.');
+      this.dispatchEvent(new CustomEvent('reply', { detail: { text: msg, done: true } }));
+    }
   }
   async _runTool(block) {
     const A = this.actions;
@@ -257,6 +291,31 @@ export function describeShape(sym, sh) {
   let txt = `${sym}: ` + (parts.length ? parts.join('; ') : 'all open strings') + '.';
   if (muted.length) txt += ` Don't play the ${muted.join(' or ')} string${muted.length > 1 ? 's' : ''}.`;
   return txt;
+}
+
+// Photo check: Claude looks at a photo of the fretting hand and compares it with the target chord shape.
+export async function photoCheck(file, sym, shapeText) {
+  const prompt = `You are Axel, a guitar coach. The attached photo shows a student's fretting hand on a guitar. They are trying to play ${sym}. The correct shape is: ${shapeText}
+Look carefully at which strings and frets each fingertip is on, finger arch (tips vs flat pads), whether fingers sit just behind the fret wire, and thumb position. Reply in 2-4 short spoken sentences: say whether the shape matches, then the single most important fix. If the photo doesn't clearly show the fretboard and fingers, say what angle to retake it from. No markdown.`;
+  if (IS_ARTIFACT) {
+    const sample = await cap('sample');
+    if (!sample) throw new Error('Claude is not available on this page.');
+    const lim = await sample.limits().catch(() => null);
+    if (!lim?.images) throw new Error('This view cannot send photos to Claude.');
+    const { text } = await sample(prompt, { images: file, modelTier: 'default', cache: false });
+    return text;
+  }
+  const key = store.get().settings.claudeKey;
+  if (!key) throw new Error('Add a Claude API key in Settings to use Photo check.');
+  const mod = await import('https://esm.sh/@anthropic-ai/sdk');
+  const client = new (mod.default || mod.Anthropic)({ apiKey: key, dangerouslyAllowBrowser: true });
+  const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(file); });
+  const msg = await client.beta.messages.create({
+    model: 'claude-opus-5-5', max_tokens: 2000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default', output_config: { effort: 'low' },
+    messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: file.type || 'image/jpeg', data: b64 } }, { type: 'text', text: prompt }] }],
+  });
+  if (msg.stop_reason === 'refusal') throw new Error('Claude declined to review that photo.');
+  return msg.content.filter(b => b.type === 'text').map(b => b.text).join(' ');
 }
 
 export const coach = new Coach();

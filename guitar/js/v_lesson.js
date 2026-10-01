@@ -8,10 +8,38 @@ import { h, toast, chordEl, tabEl, meter, fmtTime } from './ui.js';
 import { getShape, recognize, parseChord, STRUMS, STANDARD, notesToTab, prettyChord, pcName, midiName } from './theory.js';
 import { lessonById, STAGES, ALL_LESSONS, FIXES } from './lessons.js';
 import { allSongs } from './songs.js';
-import { describeShape } from './coach.js';
+import { describeShape, photoCheck } from './coach.js';
+import { IS_ARTIFACT } from './platform.js';
 import { tunerWidget } from './v_tools.js';
 
 const COMMON = ['G', 'C', 'D', 'Em', 'Am', 'E', 'A', 'Dm', 'F', 'Bm', 'E7', 'A7', 'D7', 'B7', 'G7', 'Cadd9'];
+
+// When Axel can't hear you (inside Claude, or the mic is blocked): honest self-rating keeps spaced repetition working.
+function selfCheck(ctx, what = 'it') {
+  const box = h('div', { class: 'card self-check' },
+    h('h3', {}, 'How did it go?'),
+    h('p', { class: 'muted small' }, `I can't hear you live here, so rate ${what} honestly. Or tap 🎧 Listen up top and play me a recording, and I'll grade it by ear.`),
+    h('div', { class: 'row wrap' },
+      h('button', { class: 'btn', onclick: () => ctx.complete(0.92, 'Logged as nailed. I will bring it back in a few days to make sure it sticks.') }, '✓ Nailed it'),
+      h('button', { class: 'btn ghost', onclick: () => ctx.complete(0.7, 'Getting there. Same drill tomorrow, a little cleaner.') }, 'Getting there'),
+      h('button', { class: 'btn ghost', onclick: () => ctx.complete(0.4, 'No stress. Slow it right down and we will hit it again later today.') }, 'Not yet')));
+  ctx.body.append(box);
+  return box;
+}
+// Photo check: Claude looks at a picture of your fretting hand.
+function photoBox(sym, shapeText, label = '📸 Photo check my hand') {
+  const out = h('p', { class: 'tip', hidden: true });
+  const inp = h('input', { type: 'file', accept: 'image/*', capture: 'environment', hidden: true });
+  const btn = h('button', { class: 'btn ghost', onclick: () => inp.click() }, label);
+  inp.onchange = async () => {
+    const f = inp.files[0]; if (!f) return;
+    out.hidden = false; out.textContent = 'Looking at your hand…'; btn.disabled = true;
+    try { const t = await photoCheck(f, sym, shapeText); out.textContent = '👀 ' + t; coach.say(t); }
+    catch (e) { out.textContent = e?.code === 'not_granted' ? 'Claude is not allowed on this page, so photo check is off.' : (e?.message || 'Photo check failed. Try another photo.'); }
+    finally { btn.disabled = false; inp.value = ''; }
+  };
+  return h('div', { class: 'photo-check' }, h('p', { class: 'muted small' }, 'Take a photo from the front, close enough to see the strings, frets and every fingertip.'), btn, inp, out);
+}
 
 function synthLesson(id) {
   const [type, rest = ''] = id.split(':');
@@ -72,8 +100,9 @@ export async function lessonView(root, [id], app) {
 
 // ---------- TUNE ----------
 async function runTune(ctx) {
-  await ctx.app.micOn();
+  const mic = await ctx.app.micOn();
   const w = tunerWidget({ onAllTuned: () => ctx.complete(1, 'All six strings in tune. Now we play.') });
+  if (!mic) ctx.body.append(h('p', { class: 'tip' }, 'Tune by ear: tap a string below to hear its note, pluck yours, and turn the peg until the wobble between the two sounds slows down and disappears. Or use any phone tuner app, then come back.'));
   ctx.body.append(w.el, h('button', { class: 'btn ghost', onclick: () => ctx.complete(0.9, 'Tuned up. Let\'s go.') }, 'My guitar is already in tune →'));
   return w.destroy;
 }
@@ -87,7 +116,12 @@ async function runPosture(ctx) {
   const score = meter('Posture');
   const tip = h('p', { class: 'tip' }, 'Sit tall, guitar body on your right leg (left if you play lefty), neck pointing slightly up. Show me your fretting hand, holding a chord or a C shape.');
   ctx.body.append(h('div', { class: 'cam-stage' }, v, c), h('div', { class: 'grid2' }, h('div', { class: 'card' }, h('h3', {}, 'Checklist'), h('ul', { class: 'checks' }, Object.values(checks)), score.el), h('div', { class: 'card' }, h('h3', {}, 'Axel says'), tip)));
-  if (!(await ctx.app.camOn(v, c))) { ctx.body.append(h('button', { class: 'btn', onclick: () => ctx.complete(0.7, 'No camera, no problem. Follow the checklist by eye.') }, 'Skip camera check')); return; }
+  if (!(await ctx.app.camOn(v, c))) {
+    v.closest('.cam-stage').remove();
+    ctx.body.append(h('div', { class: 'card' }, h('h3', {}, 'Posture check by photo'), photoBox('any chord you know (this is a posture check: judge finger arch, thumb behind the neck, wrist angle)', 'Fingertips arched and landing just behind the frets, thumb roughly behind the middle of the neck, wrist fairly straight, guitar neck angled slightly up.', '📸 Check my posture from a photo')));
+    selfCheck(ctx, 'your posture against the checklist');
+    return;
+  }
   let goodSince = 0, lastTip = 0;
   const onFrame = () => {
     const p = eyes.posture;
@@ -119,7 +153,12 @@ async function runChord(ctx) {
   ctx.body.append(h('div', { class: 'grid2' },
     h('div', { class: 'card center' }, diag, h('div', { class: 'row' }, h('button', { class: 'btn ghost', onclick: () => strum(sh) }, '▶ Hear it'), h('button', { class: 'btn ghost', onclick: () => arpeggio(sym) }, '▶ String by string'))),
     h('div', { class: 'card' }, h('h3', {}, 'Make it ring 3 times'), reps, match.el, status, hint, posture)));
-  await ctx.app.micOn();
+  if (!(await ctx.app.micOn())) {
+    status.textContent = 'Strum it, then pick each string one at a time. Every string should ring clearly, with no buzz and no dead notes.';
+    ctx.body.append(h('div', { class: 'card' }, photoBox(sym, describeShape(sym, sh))));
+    selfCheck(ctx, `your ${prettyChord(sym)}`);
+    return;
+  }
   let rep = 0, okSince = 0, needRelease = false, quietSince = 0, soundSince = 0, lastHint = 0, t0 = performance.now(), attempts = 0;
   const others = COMMON.filter(c => c !== sym).slice(0, 10);
   const onFrame = () => {
@@ -168,7 +207,8 @@ async function runChange(ctx) {
   const da = chordEl(a, { size: 150 }), db = chordEl(b, { size: 150 });
   const startBtn = h('button', { class: 'btn big' }, '▶ Start 60 seconds');
   ctx.body.append(h('div', { class: 'card center' }, h('div', { class: 'row chords-pair' }, da, h('span', { class: 'arrows' }, '⇄'), db), h('div', { class: 'row stats' }, h('div', {}, count, h('small', {}, 'changes')), h('div', {}, clock, h('small', {}, 'left')), h('div', {}, h('div', { class: 'counter dim' }, String(best)), h('small', {}, 'your best'))), status, startBtn));
-  await ctx.app.micOn();
+  const mic = await ctx.app.micOn();
+  if (!mic) status.textContent = `Count your own changes out loud: every time you land ${prettyChord(a)} or ${prettyChord(b)} cleanly, that's one. Target: ${target}.`;
   let running = false, n = 0, state = null, cand = null, candSince = 0, t0 = 0, iv;
   const onFrame = () => {
     if (!running) return;
@@ -194,12 +234,21 @@ async function runChange(ctx) {
       if (left <= 10 && left > 9.7) coach.say('Ten seconds!');
       if (left <= 0) {
         running = false; clearInterval(iv);
-        const isBest = store.setBest(key, n);
-        const score = Math.min(1, n / target);
-        const msg = `${n} changes${isBest && best ? `, a new personal best, up from ${best}` : isBest ? ', your first score on the board' : `. Your best is ${best}`}. ${n >= target ? 'You hit the target. This change is yours.' : `Target is ${target}. Do this once a day; the number climbs fast.`}`;
-        ctx.complete(score, msg, { count: n });
+        if (!mic) {
+          const inp = h('input', { type: 'number', min: 0, max: 200, id: 'oneMinCount', placeholder: 'How many?', style: { maxWidth: '8em' } });
+          status.replaceChildren('Time! How many clean changes did you count? ', inp, ' ', h('button', { class: 'btn', onclick: () => { n = Math.max(0, Math.round(+inp.value || 0)); count.textContent = n; finishChange(); } }, 'Save'));
+          coach.say('Time! How many did you get?'); inp.focus();
+          return;
+        }
+        finishChange();
       }
     }, 100);
+  };
+  const finishChange = () => {
+    const isBest = store.setBest(key, n);
+    const score = Math.min(1, n / target);
+    const msg = `${n} changes${isBest && best ? `, a new personal best, up from ${best}` : isBest ? ', your first score on the board' : `. Your best is ${best}`}. ${n >= target ? 'You hit the target. This change is yours.' : `Target is ${target}. Do this once a day; the number climbs fast.`}`;
+    ctx.complete(score, msg, { count: n });
   };
   startBtn.onclick = go;
   ctx.app.ctl.start = go;
@@ -223,7 +272,8 @@ async function runStrum(ctx) {
   ctx.body.append(h('div', { class: 'grid2' },
     h('div', { class: 'card center' }, chordEl(chord, { size: 130 }), h('div', { class: 'pattern' }, slotEls), h('div', { class: 'row' }, h('button', { class: 'btn ghost', onclick: () => demo() }, '▶ Hear the pattern'), h('span', { class: 'bpm-read' }, bpmEl, ' bpm'))),
     h('div', { class: 'card' }, h('h3', {}, 'Live grading'), lane, accM.el, dirM.el, status, startBtn)));
-  await ctx.app.micOn();
+  const mic = await ctx.app.micOn();
+  if (!mic) { status.textContent = pat.tip + ' Play along with the click. Grading needs a mic, so rate yourself below.'; selfCheck(ctx, 'your timing'); }
   const demo = async () => {
     const ac = await ears.ensureContext(); const spb = 60 / bpm, t = ac.currentTime + 0.1;
     [...pat.slots].forEach((s, i) => { if (s === 'D' || s === 'U') strum(chord, { when: t + i * spb / 2, dir: s, vel: i % 2 ? 0.45 : 0.75 }); else if (s !== '-') playPick(chord, s, t + i * spb / 2); });
@@ -320,7 +370,7 @@ async function runRiff(ctx) {
     tabWrap, h('div', { class: 'row' }, heard, status),
     h('div', { class: 'row' }, h('button', { class: 'btn ghost', onclick: () => demo() }, '▶ Play it for me'), h('button', { class: 'btn ghost', onclick: () => { i = 0; mistakes = 0; draw(); } }, '↺ From the top'))));
   draw();
-  await ctx.app.micOn();
+  if (!(await ctx.app.micOn())) { status.textContent = 'Read the tab left to right: string, then fret. Tap ▶ to hear it, then play along.'; selfCheck(ctx, 'the riff'); }
   const demo = async () => {
     const ac = await ears.ensureContext(); let t = ac.currentTime + 0.1; const spb = 60 / Math.min(s.bpm || 90, 100);
     notes.forEach(([m, d]) => { playNote(m + capo, { when: t, vel: 0.8, dur: Math.min(2.4, d * spb + 0.6) }); t += d * spb; });

@@ -18,7 +18,35 @@ state.profile = Object.assign(defaults().profile, state.profile);
 state.settings = Object.assign(defaults().settings, state.settings);
 
 const subs = new Set();
-export function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} subs.forEach(f => f(state)); }
+let remote = null, pushTimer = null;
+export function save() {
+  state.updatedAt = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  subs.forEach(f => f(state));
+  if (remote) { clearTimeout(pushTimer); pushTimer = setTimeout(pushRemote, 2500); }
+}
+// Account sync (Claude artifact `db`): one private document per person. API keys never leave this browser.
+const forRemote = () => ({ ...state, settings: { ...state.settings, claudeKey: '', elevenKey: '' } });
+function pushRemote() { remote?.set({ json: JSON.stringify(forRemote()), updatedAt: state.updatedAt || Date.now() }).catch(e => console.warn('sync failed', e)); }
+export async function attachRemote(docRef) {
+  remote = docRef;
+  try {
+    const snap = await docRef.get();
+    const d = snap.exists ? snap.data() : null;
+    if (d?.json && (d.updatedAt || 0) > (state.updatedAt || 0)) {
+      const keep = { claudeKey: state.settings.claudeKey, elevenKey: state.settings.elevenKey };
+      const incoming = JSON.parse(d.json);
+      state = Object.assign(defaults(), incoming);
+      state.profile = Object.assign(defaults().profile, incoming.profile);
+      state.settings = Object.assign(defaults().settings, incoming.settings, keep);
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+      subs.forEach(f => f(state));
+      return 'pulled';
+    }
+    pushRemote();
+    return 'pushed';
+  } catch (e) { console.warn('sync unavailable', e); remote = null; return 'off'; }
+}
 export const get = () => state;
 export const onChange = f => { subs.add(f); return () => subs.delete(f); };
 export function reset() { state = defaults(); save(); }

@@ -10,16 +10,22 @@ import { allSongs } from './songs.js';
 import { lessonById, ALL_LESSONS } from './lessons.js';
 import { VIEWS } from './views.js';
 import { describeShape } from './coach.js';
+import { IS_ARTIFACT, cap } from './platform.js';
 
 export const app = {
   ctl: null, plan: [], planIdx: -1, current: '', mini: null,
   go(hash) { if (location.hash === hash) render(); else location.hash = hash; },
   async micOn() {
-    if (ears.running) return true;
+    if (ears.running) return true; // the mic, or a recording playing through 🎧 Listen
+    if (IS_ARTIFACT) {
+      if (!app._micNoted) { app._micNoted = true; toast('Inside Claude the live mic is off. Use 🎧 Listen up top to analyze a recording, or the self-check buttons.', 'info', 6500); }
+      return false;
+    }
     try { await ears.start(); ears.setSensitivity(store.get().settings.sensitivity); updateSensors(); return true; }
     catch (e) { toast('Microphone blocked. Allow mic access so Axel can hear you.', 'bad', 5000); return false; }
   },
   async camOn(videoEl, canvasEl) {
+    if (IS_ARTIFACT) return false;
     try {
       eyes.leftHanded = store.get().profile.leftHanded;
       if (videoEl) await eyes.moveTo(videoEl, canvasEl); else await ensureMiniCam();
@@ -83,11 +89,11 @@ window.addEventListener('hashchange', render);
 const sens = {};
 function buildSensors() {
   const bar = $('#sensors');
-  sens.mic = h('button', { class: 'sensor', onclick: () => ears.running ? (ears.stop(), updateSensors()) : app.micOn() }, h('i', { class: 'dot' }), h('span', {}, 'Ears'));
+  sens.mic = h('button', { class: 'sensor', title: IS_ARTIFACT ? 'Analyze a recording' : 'Microphone', onclick: () => IS_ARTIFACT ? listenToFile() : ears.running ? (ears.stop(), updateSensors()) : app.micOn() }, h('i', { class: 'dot' }), h('span', {}, IS_ARTIFACT ? '🎧 Listen' : 'Ears'));
   sens.level = h('div', { class: 'lvl' }, h('i'));
   sens.note = h('b', { class: 'heard', title: 'What Axel hears' }, '—');
-  sens.cam = h('button', { class: 'sensor', onclick: () => eyes.running ? app.camOff() : app.camOn() }, h('i', { class: 'dot' }), h('span', {}, 'Eyes'));
-  sens.voice = h('button', { class: 'sensor', onclick: () => coach.listening ? coach.stopListening() : coach.startListening() }, h('i', { class: 'dot' }), h('span', {}, 'Voice'));
+  sens.cam = h('button', { class: 'sensor', onclick: () => IS_ARTIFACT ? app.go('#/camera') : eyes.running ? app.camOff() : app.camOn() }, h('i', { class: 'dot' }), h('span', {}, IS_ARTIFACT ? '📼 Video coach' : 'Eyes'));
+  sens.voice = h('button', { class: 'sensor', hidden: IS_ARTIFACT || undefined, onclick: () => coach.listening ? coach.stopListening() : coach.startListening() }, h('i', { class: 'dot' }), h('span', {}, 'Voice'));
   sens.metro = h('button', { class: 'sensor metro', onclick: () => metronome.running ? metronome.stop() : metronome.start(metronome.bpm) }, h('span', {}, '♩ ', h('b', { class: 'bpm' }, metronome.bpm)));
   const minus = h('button', { class: 'mini-btn', onclick: () => metronome.setBpm(metronome.bpm - 5), 'aria-label': 'Slower' }, '−');
   const plus = h('button', { class: 'mini-btn', onclick: () => metronome.setBpm(metronome.bpm + 5), 'aria-label': 'Faster' }, '+');
@@ -97,11 +103,26 @@ function buildSensors() {
   metronome.addEventListener('beat', e => { sens.metro.classList.add('tick'); setTimeout(() => sens.metro.classList.remove('tick'), 90); if (e.detail.beatInBar === 0) sens.metro.classList.add('down'); else sens.metro.classList.remove('down'); });
   coach.addEventListener('listening', updateSensors);
   ears.addEventListener('frame', () => {
+    if (!sens.mic.classList.contains('on')) updateSensors();
     sens.level.firstChild.style.width = Math.min(100, Math.max(0, (ears.db + 60) * 1.8)) + '%';
     const c = ears.chord, p = ears.pitch;
     const txt = c && c.score > 0.8 ? prettyChord(c.name) : p ? noteLabel(p.note) : '—';
     if (sens.note.textContent !== txt) sens.note.textContent = txt;
   });
+}
+// Artifact mode: feed the ears from an uploaded recording in a small floating player.
+function listenToFile() {
+  const inp = h('input', { type: 'file', accept: 'audio/*,video/*', hidden: true });
+  inp.onchange = async () => {
+    const f = inp.files[0]; if (!f) return;
+    document.querySelector('.file-player')?.remove();
+    const a = h('audio', { controls: true, src: URL.createObjectURL(f) });
+    const box = h('div', { class: 'file-player' }, h('small', {}, '🎧 ' + f.name), a, h('button', { class: 'icon-btn', 'aria-label': 'Close player', onclick: () => { a.pause(); ears.stop(); box.remove(); updateSensors(); } }, '✕'));
+    document.body.append(box);
+    await ears.listenTo(a); a.play().catch(() => {}); updateSensors();
+    toast('Axel is listening to your recording: chords, notes and timing show up live.', 'good');
+  };
+  document.body.append(inp); inp.click(); setTimeout(() => inp.remove(), 60000);
 }
 const noteLabel = m => ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'][m % 12] + (Math.floor(m / 12) - 1);
 function updateSensors() {
@@ -127,15 +148,16 @@ let avatar;
 function buildDock() {
   const dock = $('#dock');
   avatar = avatarEl(76);
-  const bubble = h('div', { class: 'bubble', 'aria-live': 'polite' }, 'Yo! I\'m Axel. Turn on my Ears 🎤 and Eyes 📷 up top, then hit Start.');
+  const bubble = h('div', { class: 'bubble', 'aria-live': 'polite' }, IS_ARTIFACT ? 'Yo! I\'m Axel. Hit Start, or ask me anything. Load a recording of yourself and I\'ll grade it.' : 'Yo! I\'m Axel. Turn on my Ears 🎤 and Eyes 📷 up top, then hit Start.');
   const heard = h('div', { class: 'heard-line' });
-  const input = h('input', { type: 'text', placeholder: 'Ask Axel… (or say "Axel, show me F")', 'aria-label': 'Message Axel' });
+  const input = h('input', { type: 'text', id: 'askAxel', placeholder: IS_ARTIFACT ? 'Ask Axel… e.g. "show me F"' : 'Ask Axel… (or say "Axel, show me F")', 'aria-label': 'Message Axel' });
   const send = () => { const v = input.value.trim(); if (!v) return; input.value = ''; coach.ask(v); };
   input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
-  const talk = h('button', { class: 'talk', title: 'Push to talk', 'aria-label': 'Push to talk', onclick: () => coach.pushToTalk() }, '🎙');
+  const talk = h('button', { class: 'talk', hidden: IS_ARTIFACT || undefined, title: 'Push to talk', 'aria-label': 'Push to talk', onclick: () => coach.pushToTalk() }, '🎙');
   const hush = h('button', { class: 'icon-btn', title: 'Stop talking', 'aria-label': 'Stop Axel talking', onclick: () => coach.stopSpeaking() }, '■');
   const toggle = h('button', { class: 'icon-btn collapse', 'aria-label': 'Collapse coach', onclick: () => dock.classList.toggle('collapsed') }, '▾');
-  dock.append(h('div', { class: 'dock-face', onclick: () => dock.classList.remove('collapsed') }, avatar.el), h('div', { class: 'dock-main' }, bubble, heard, h('div', { class: 'dock-input' }, input, talk, hush)), toggle);
+  const sendBtn = h('button', { class: 'talk send', title: 'Send', 'aria-label': 'Send message', onclick: send }, '➤');
+  dock.append(h('div', { class: 'dock-face', onclick: () => dock.classList.remove('collapsed') }, avatar.el), h('div', { class: 'dock-main' }, bubble, heard, h('div', { class: 'dock-input' }, input, IS_ARTIFACT ? sendBtn : talk, hush)), toggle);
   coach.addEventListener('reply', e => { bubble.textContent = e.detail.text; bubble.classList.remove('user'); });
   coach.addEventListener('said', e => { bubble.textContent = e.detail; bubble.classList.remove('user'); });
   coach.addEventListener('user', e => { heard.textContent = '🗣 ' + e.detail; });
@@ -185,11 +207,21 @@ coach.context = () => {
   };
 };
 
+// ---------- Account sync (artifact) ----------
+async function syncAccount() {
+  const [db, user] = await Promise.all([cap('db'), cap('user')]);
+  const id = await user?.id?.().catch(() => null);
+  if (!db || !id) return;
+  const r = await store.attachRemote(db.collection('data/users/' + id).doc('progress'));
+  if (r === 'pulled') { toast('Progress synced from your account', 'good'); render(); }
+}
+
 // ---------- Boot ----------
 function boot() {
   buildSensors(); buildDock(); updateSensors();
   const st = store.get();
   if (st.settings.gateDb) ears.gateDb = st.settings.gateDb;
+  if (IS_ARTIFACT) { document.documentElement.classList.add('in-artifact'); syncAccount(); }
   metronome.volume = st.settings.metronomeVol;
   if (st.profile.name) $('#hello').textContent = st.profile.name;
   render();
@@ -197,7 +229,7 @@ function boot() {
   window.addEventListener('pointerdown', () => ears.ensureContext(), { once: true });
   if (!st.seen.welcome) {
     st.seen.welcome = 1; store.save();
-    setTimeout(() => coach.say("Hey, I'm Axel, your guitar coach. I can hear you, I can see your hands, and I'll get you playing songs you love fast. Hit Start Today's Session when you're ready."), 900);
+    setTimeout(() => coach.say(IS_ARTIFACT ? "Hey, I'm Axel, your guitar coach. I'll get you playing songs you love, fast. Hit Start Today's Session when you're ready." : "Hey, I'm Axel, your guitar coach. I can hear you, I can see your hands, and I'll get you playing songs you love fast. Hit Start Today's Session when you're ready."), 900);
   }
   let t0 = Date.now();
   setInterval(() => { if (document.visibilityState === 'visible' && (ears.running || metronome.running)) { const m = (Date.now() - t0) / 60000; if (m >= 1) { store.logMinutes(1); t0 = Date.now(); } } else t0 = Date.now(); }, 15000);

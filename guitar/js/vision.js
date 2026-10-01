@@ -1,4 +1,7 @@
 // The coach's EYES: MediaPipe HandLandmarker in the browser. Fretting-hand posture, strumming-hand motion tracking, and hands-free gestures.
+// Live camera on the open web; inside a Claude artifact (no camera) the same pipeline watches an uploaded video, with the engine shipped as local files.
+import { IS_ARTIFACT } from './platform.js';
+const LOCAL = n => new URL('../mp/' + n, import.meta.url).href;
 const TASKS = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
 const MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
 
@@ -22,29 +25,55 @@ export class Eyes extends EventTarget {
     this.fret = null; this.strum = null; this.trail = []; this.strumEvents = []; this.posture = null;
     this._lastGesture = 0; this._dirY = 0; this._extreme = null;
   }
+  async loadModel() {
+    if (this.landmarker) return;
+    this.dispatchEvent(new CustomEvent('status', { detail: 'Loading hand-tracking model…' }));
+    let HandLandmarker, fileset, base;
+    if (IS_ARTIFACT) {
+      ({ HandLandmarker } = await import(LOCAL('vision_bundle.mjs')));
+      fileset = { wasmLoaderPath: LOCAL('vision_wasm_internal.js'), wasmBinaryPath: LOCAL('vision_wasm_internal.wasm') };
+      // The model ships base64-encoded as text (artifacts only serve web file types).
+      const b64 = await (await fetch(LOCAL('hand_landmarker.b64.txt'))).text();
+      const bin = atob(b64.trim()); const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      base = { modelAssetBuffer: bytes };
+    } else {
+      let FilesetResolver;
+      ({ FilesetResolver, HandLandmarker } = await import(TASKS + '/vision_bundle.mjs'));
+      fileset = await FilesetResolver.forVisionTasks(TASKS + '/wasm');
+      base = { modelAssetPath: MODEL };
+    }
+    const opts = { baseOptions: { ...base, delegate: 'GPU' }, runningMode: 'VIDEO', numHands: 2, minHandDetectionConfidence: 0.5, minTrackingConfidence: 0.5 };
+    try { this.landmarker = await HandLandmarker.createFromOptions(fileset, opts); }
+    catch (e) { opts.baseOptions.delegate = 'CPU'; this.landmarker = await HandLandmarker.createFromOptions(fileset, opts); }
+  }
   async start(videoEl, canvasEl) {
     this.video = videoEl; this.canvas = canvasEl; this.g = canvasEl.getContext('2d');
     if (!this.stream) {
       this.stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 960 }, height: { ideal: 540 }, facingMode: 'user' }, audio: false });
     }
     videoEl.srcObject = this.stream; videoEl.muted = true; videoEl.playsInline = true; await videoEl.play();
-    if (!this.landmarker) {
-      this.dispatchEvent(new CustomEvent('status', { detail: 'Loading hand-tracking model…' }));
-      const { FilesetResolver, HandLandmarker } = await import(TASKS + '/vision_bundle.mjs');
-      const fileset = await FilesetResolver.forVisionTasks(TASKS + '/wasm');
-      const opts = { baseOptions: { modelAssetPath: MODEL, delegate: 'GPU' }, runningMode: 'VIDEO', numHands: 2, minHandDetectionConfidence: 0.5, minTrackingConfidence: 0.5 };
-      try { this.landmarker = await HandLandmarker.createFromOptions(fileset, opts); }
-      catch (e) { opts.baseOptions.delegate = 'CPU'; this.landmarker = await HandLandmarker.createFromOptions(fileset, opts); }
-    }
+    await this.loadModel();
+    this._loop();
+  }
+  // Watch a recorded video instead of the camera (the video element already has its src and is played by the caller).
+  async watchFile(videoEl, canvasEl) {
+    this.video = videoEl; this.canvas = canvasEl; this.g = canvasEl.getContext('2d'); this.fromFile = true;
+    this.trail = []; this.strumEvents = [];
+    await this.loadModel();
+    this._loop();
+  }
+  _loop() {
+    cancelAnimationFrame(this._raf);
     this.running = true;
     this.dispatchEvent(new CustomEvent('status', { detail: 'Eyes on. I can see you.' }));
     const loop = () => { if (!this.running) return; this._frame(); this._raf = requestAnimationFrame(loop); };
     loop();
   }
   stop() {
-    this.running = false; cancelAnimationFrame(this._raf);
+    this.running = false; this.fromFile = false; cancelAnimationFrame(this._raf);
     this.stream?.getTracks().forEach(t => t.stop()); this.stream = null;
-    if (this.video) this.video.srcObject = null;
+    if (this.video && this.video.srcObject) this.video.srcObject = null;
   }
   // Re-attach to a new <video>/<canvas> pair (views change) without reloading the model.
   async moveTo(videoEl, canvasEl) {
@@ -54,9 +83,10 @@ export class Eyes extends EventTarget {
   }
   _frame() {
     const v = this.video;
-    if (!v || v.readyState < 2) return;
+    if (!v || v.readyState < 2 || (this.fromFile && v.paused)) return;
     const now = performance.now();
     if (now === this._lastTs) return; this._lastTs = now;
+    if (v.videoWidth === 0) return;
     const res = this.landmarker.detectForVideo(v, now);
     const hands = (res.landmarks || []).map((lm, i) => ({ lm, side: res.handedness?.[i]?.[0]?.categoryName }));
     this._assignHands(hands);
