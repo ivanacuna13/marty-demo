@@ -1,0 +1,179 @@
+{
+ "pieces.glb": {
+  "file": "pieces.glb",
+  "bytes": 4713092,
+  "pieces": {
+   "pawn": {
+    "nodes": [
+     "pawn_body",
+     "pawn_eyes",
+     "pawn_weapon"
+    ],
+    "tris": {
+     "pawn_body": 11499,
+     "pawn_eyes": 392,
+     "pawn_weapon": 1300
+    },
+    "total_tris": 13191,
+    "height": 1.0614,
+    "plinth_radius": 0.3413,
+    "materials": {
+     "pawn_body": "stone_pawn",
+     "pawn_eyes": "glow",
+     "pawn_weapon": "stone"
+    }
+   },
+   "rook": {
+    "nodes": [
+     "rook_body",
+     "rook_eyes"
+    ],
+    "tris": {
+     "rook_body": 11499,
+     "rook_eyes": 24
+    },
+    "total_tris": 11523,
+    "height": 1.451,
+    "plinth_radius": 0.3709,
+    "materials": {
+     "rook_body": "stone_rook",
+     "rook_eyes": "glow"
+    }
+   },
+   "knight": {
+    "nodes": [
+     "knight_body",
+     "knight_eyes"
+    ],
+    "tris": {
+     "knight_body": 11474,
+     "knight_eyes": 392
+    },
+    "total_tris": 11866,
+    "height": 1.5027,
+    "plinth_radius": 0.3609,
+    "materials": {
+     "knight_body": "stone_knight",
+     "knight_eyes": "glow"
+    }
+   },
+   "bishop": {
+    "nodes": [
+     "bishop_body",
+     "bishop_eyes",
+     "bishop_weapon"
+    ],
+    "tris": {
+     "bishop_body": 11497,
+     "bishop_eyes": 392,
+     "bishop_weapon": 1300
+    },
+    "total_tris": 13189,
+    "height": 1.7021,
+    "plinth_radius": 0.3516,
+    "materials": {
+     "bishop_body": "stone_bishop",
+     "bishop_eyes": "glow",
+     "bishop_weapon": "stone"
+    }
+   },
+   "queen": {
+    "nodes": [
+     "queen_body",
+     "queen_eyes"
+    ],
+    "tris": {
+     "queen_body": 11500,
+     "queen_eyes": 392
+    },
+    "total_tris": 11892,
+    "height": 1.9015,
+    "plinth_radius": 0.371,
+    "materials": {
+     "queen_body": "stone_queen",
+     "queen_eyes": "glow"
+    }
+   },
+   "king": {
+    "nodes": [
+     "king_body",
+     "king_eyes",
+     "king_weapon"
+    ],
+    "tris": {
+     "king_body": 11500,
+     "king_eyes": 392,
+     "king_weapon": 1300
+    },
+    "total_tris": 13192,
+    "height": 2.1008,
+    "plinth_radius": 0.3812,
+    "materials": {
+     "king_body": "stone_king",
+     "king_eyes": "glow",
+     "king_weapon": "stone"
+    }
+   }
+  },
+  "images": [
+   {
+    "name": "bishop_normal",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "bishop_ao",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "king_normal",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "king_ao",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "knight_normal",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "knight_ao",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "pawn_normal",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "pawn_ao",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "queen_normal",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "queen_ao",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "rook_normal",
+    "mimeType": "image/jpeg"
+   },
+   {
+    "name": "rook_ao",
+    "mimeType": "image/jpeg"
+   }
+  ],
+  "materials": [
+   "stone_bishop",
+   "glow",
+   "stone",
+   "stone_king",
+   "stone_knight",
+   "stone_pawn",
+   "stone_queen",
+   "stone_rook"
+  ]
+ }
+}
