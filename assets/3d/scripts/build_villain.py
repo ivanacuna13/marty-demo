@@ -59,6 +59,17 @@ for p in v.parts:
     built.append((p, ob))
     print('PART', p['name'], tris(ob), 'budget', budget)
 
+# ---- enlarge the head subtree about the neck pivot (giant, readable heads)
+head_nodes = {'head'} | {n for n in v.nodes if v.ancestor(n, 'head')}
+NP = v.nodes['head'][1]
+HS = Matrix.Translation(NP) @ Matrix.Scale(v.head_scale, 4) @ Matrix.Translation(-NP)
+for p, ob in built:
+    if p['node'] in head_nodes:
+        ob.data.transform(HS)
+for n in head_nodes - {'head'}:
+    par, pv = v.nodes[n]
+    v.nodes[n] = (par, HS @ pv)
+
 # ---- fit: uniform scale so the top of the head subtree is at HEAD_TOP
 head_nodes = {'head'} | {n for n in v.nodes if v.ancestor(n, 'head')}
 top = max(max((ob.matrix_world @ vv.co).z for vv in ob.data.vertices)
@@ -71,6 +82,11 @@ for p, ob in built:
     ob.data.transform(F)
     ob.data.update()
 piv = {n: F @ pv for n, (par, pv) in v.nodes.items()}
+for p, ob in built:  # weathering moves the throne bottom a little: sit it exactly on z = 0
+    if p['node'] == 'throne':
+        zmin = min(vv.co.z for vv in ob.data.vertices)
+        ob.data.transform(Matrix.Translation((0, 0, -zmin)))
+        print('THRONE snap', round(zmin, 4))
 
 # ---- hierarchy
 objs = {}

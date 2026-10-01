@@ -15,9 +15,10 @@ ARM_TOP = 2.85
 
 
 class V:
-    def __init__(self):
+    def __init__(self, head_scale=1.3):
         self.nodes = {}
         self.parts = []
+        self.head_scale = head_scale
 
     def node(self, name, parent, pivot):
         self.nodes[name] = (parent, Vector(pivot))
@@ -197,8 +198,8 @@ def boot(s, ankle, toe_len=0.55, r=0.24, pointed=False):
 
 # =========================================================================== MALVORN
 def build_malvorn():
-    v = V()
-    rig = Rig(sx=1.0, head_z=5.22)
+    v = V(head_scale=1.35)
+    rig = Rig(sx=1.1, head_z=5.22)
     rig.nodes(v)
 
     def deco(adds, cuts, post):
@@ -242,9 +243,6 @@ def build_malvorn():
             adds.append(tube('rib', bez((0, -0.14, z), (s * 0.45, -0.18, z - 0.06), (s * 0.85, 0.05, z - 0.2),
                                         (s * 0.98, 0.45, z - 0.32), 12), taper(12, 0.06, 0.04), seg=10))
     adds.append(torus('belt', (0, 0.6, 2.32), 0.8, 0.07, scale=(1, 0.74, 1), seg=64, rseg=10))
-    adds.append(ellipsoid('belt_skull', (0, -0.02, 2.33), (0.2, 0.12, 0.2)))
-    for e in (-1, 1):
-        cuts.append(ellipsoid('belt_skull_eye', (e * 0.07, -0.13, 2.36), (0.05, 0.05, 0.045)))
     for s in (-1, 1):
         f = lathe('fauld', [(0.86, 2.3), (0.95, 2.05), (0.92, 2.02), (1.0, 1.85)], seg=10,
                   arc=(rad(-90) + s * rad(15), rad(-90) + s * rad(60)), loc=(0, 0.6, 0), scale=(1, 0.8, 1))
@@ -364,7 +362,7 @@ def build_malvorn():
 
 # =========================================================================== GRUKK
 def build_grukk():
-    v = V()
+    v = V(head_scale=1.3)
     rig = Rig(sx=1.18, head_z=5.12, head_y=0.25)
     rig.nodes(v)
     AX = (2.48, -1.0)
@@ -549,7 +547,7 @@ def build_grukk():
 
 # =========================================================================== MORWEN
 def build_morwen():
-    v = V()
+    v = V(head_scale=1.22)
     rig = Rig(sx=0.82, head_z=5.02, head_y=0.42)
     rig.nodes(v)
     ST = (-2.42, -1.0)
@@ -586,10 +584,11 @@ def build_morwen():
         return boot(s, ankle, 0.55, 0.2, pointed=True)
     seated_legs(v, rig, 0.3, 0.22, leg_extra, w=3.0)
     adds = []
-    sk = lathe('skirt', [(1.05, 2.25), (1.1, 2.1), (1.12, 1.4), (1.16, 0.85), (1.2, 0.62)], seg=48,
-               arc=(rad(-160), rad(-20)), loc=(0, -0.05, 0), mod=lambda t, z, r: ragged(t, z, r, 0.06, 15))
+    sk = lathe('skirt', [(1.15, 2.3), (1.3, 2.1), (1.38, 1.4), (1.42, 0.85), (1.45, 0.52)], seg=56,
+               arc=(rad(-172), rad(-8)), loc=(0, -0.64, 0), scale=(1, 0.6, 1),
+               mod=lambda t, z, r: ragged(t, z, r, 0.06, 15))
     adds.append(solidify(sk, 0.07, -1))
-    lap = lathe('lap', [(0.0, 2.38), (0.95, 2.38), (1.08, 2.25), (0.0, 2.1)], seg=48, loc=(0, -0.05, 0),
+    lap = lathe('lap', [(0.0, 2.42), (1.0, 2.42), (1.24, 2.25), (0.0, 2.1)], seg=48, loc=(0, -0.05, 0),
                 scale=(1, 1.15, 1), mod=lambda t, z, r: ragged(t, z, r, 0.04, 9))
     adds.append(lap)
     v.part('robe_skirt', 'legs', adds, w=3.0, voxel=0.018)
@@ -685,7 +684,8 @@ def build_morwen():
         else:
             W = rig.W[s]
         adds = [tube('uarm', [S, E], [0.17, 0.16], seg=18),
-                seg_cyl('sleeve', S.lerp(E, 0.05), E, 0.24, 0.27, seg=24)]
+                seg_cyl('sleeve', S.lerp(E, 0.05), E, 0.24, 0.27, seg=24),
+                ellipsoid('sleeve_elbow', E, (0.28, 0.28, 0.28)), ellipsoid('sleeve_sh', S, (0.27, 0.27, 0.27))]
         v.part('upperarm_' + L, 'arm_' + L, adds, w=1.6, voxel=0.013)
         adds = [tube('farm', [E, W], [0.15, 0.1], seg=18),
                 ellipsoid('elbow', E, (0.17, 0.17, 0.17))]
@@ -735,17 +735,34 @@ def build_morwen():
 
 
 # =========================================================================== BASALT
-def rock(name, c, n, size, rnd, flat=0.6, jitter=0.28):
+def rock(name, c, n, size, rnd, flat=0.6, jitter=0.28, detail=True):
     bm = bmesh.new()
     bmesh.ops.create_icosphere(bm, subdivisions=1, radius=1.0)
     for vv in bm.verts:
         vv.co *= 1 + rnd.uniform(-jitter, jitter)
+    if detail:
+        bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=1, use_grid_fill=True)
+        for vv in bm.verts:
+            vv.co *= 1 + rnd.uniform(-0.05, 0.03)
     ob = obj_from_bm(name, bm)
     n = Vector(n).normalized()
     q = Vector((0, 0, 1)).rotation_difference(n)
     spin = Matrix.Rotation(rnd.uniform(0, TAU), 4, 'Z')
     sc = Matrix.Diagonal((size * rnd.uniform(0.85, 1.25), size * rnd.uniform(0.85, 1.25), size * flat, 1))
     return xform(ob, Matrix.Translation(c) @ q.to_matrix().to_4x4() @ spin @ sc)
+
+
+def slab(name, loc, size, rnd, jitter=0.06, rot=(0, 0, 0)):
+    bm = bmesh.new()
+    bmesh.ops.create_cube(bm, size=1.0)
+    bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=2, use_grid_fill=True)
+    for vv in bm.verts:
+        vv.co.x *= size[0]
+        vv.co.y *= size[1]
+        vv.co.z *= size[2]
+        vv.co += Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1))) * jitter
+    ob = obj_from_bm(name, bm)
+    return xform(ob, M(loc, rot))
 
 
 def rock_skin(core_objs, spacing, size, rnd, flat=0.6, push=0.35, keep=None):
@@ -769,7 +786,7 @@ def rock_skin(core_objs, spacing, size, rnd, flat=0.6, push=0.35, keep=None):
 
 
 def build_basalt():
-    v = V()
+    v = V(head_scale=1.3)
     rig = Rig(sx=1.12, head_z=5.18, head_y=0.35)
     rig.nodes(v)
     rnd = random.Random(42)
@@ -779,21 +796,25 @@ def build_basalt():
         v.part(name, node, rocks + list(extra_rocks), w=w_rock, mode='facet')
         v.part('lava_' + name, node, [core], mat='emissive', w=w_core, mode='smooth')
 
-    # throne: rough-hewn slabs
+    # throne: rough-hewn basalt slabs
     adds = []
     tr = random.Random(7)
-    adds.append(rock('base', (0, 0.35, 0.18), (0, 0, 1), 2.6, tr, flat=0.08, jitter=0.12))
-    adds.append(rock('seat', (0, 0.6, 1.1), (0, 0, 1), 1.75, tr, flat=0.45, jitter=0.1))
-    adds.append(rock('back', (0, 2.1, 4.3), (0, 1, 0), 1.9, tr, flat=0.22, jitter=0.12))
+    adds.append(slab('base', (0, 0.35, 0.175), (4.9, 4.7, 0.35), tr, 0.05))
+    adds.append(slab('step', (0, -2.05, 0.09), (4.3, 0.6, 0.18), tr, 0.04))
+    adds.append(slab('seat', (0, 0.6, 1.1), (3.3, 2.8, 1.5), tr, 0.07))
+    adds.append(slab('back', (0, 2.05, 4.3), (3.4, 0.7, 5.0), tr, 0.1))
     for s in (-1, 1):
-        adds.append(rock('side', (s * 1.95, 0.4, 1.55), (1, 0, 0), 1.55, tr, flat=0.2, jitter=0.12))
-        adds.append(rock('arm', (s * 1.95, 0.35, ARM_TOP - 0.12), (0, 0, 1), 1.6, tr, flat=0.1, jitter=0.1))
-        adds.append(rock('post', (s * 1.85, 2.05, 5.6), (1, 0, 0), 0.9, tr, flat=0.5, jitter=0.25))
+        adds.append(slab('side', (s * 1.95, 0.4, 1.6), (0.6, 3.0, 2.5), tr, 0.07))
+        adds.append(slab('arm', (s * 1.95, 0.35, ARM_TOP - 0.1), (0.75, 3.3, 0.24), tr, 0.04))
+        adds.append(slab('post', (s * 1.9, 2.05, 3.7), (0.7, 0.9, 7.0), tr, 0.1, rot=(0, s * 0.03, 0)))
+        adds.append(rock('post_cap', (s * 1.9, 2.05, 7.35), (0, 0, 1), 0.55, tr, 0.8))
+    adds.append(slab('lintel', (0, 2.05, 6.95), (3.9, 0.95, 0.5), tr, 0.08))
+    for k in range(4):
+        adds.append(rock('crown_rock', (-1.0 + 0.66 * k, 2.05, 7.35 + tr.uniform(0, 0.25)), (0, 0, 1),
+                         tr.uniform(0.35, 0.5), tr, 0.8))
     for k in range(10):
         a = tr.uniform(0, TAU)
         adds.append(rock('rubble', (2.6 * math.cos(a), 0.35 + 2.4 * math.sin(a), 0.3), (0, 0, 1), tr.uniform(0.2, 0.45), tr, 0.6))
-    for k in range(5):
-        adds.append(rock('crown_rock', (tr.uniform(-1.4, 1.4), 2.1, 6.4 + tr.uniform(0, 0.8)), (0, 1, 0.3), tr.uniform(0.35, 0.6), tr, 0.7))
     v.part('throne', 'throne', adds, w=6.0, mode='facet')
 
     # legs
@@ -817,7 +838,7 @@ def build_basalt():
     # head: boulder, brow ledge, crystal crown
     HC = rig.HC
     core = [ellipsoid('head', HC, (0.5, 0.5, 0.48))]
-    extra = [rock('brow', HC + Vector((0, -0.42, 0.12)), (0, -1, 0.6), 0.48, rnd, 0.32, 0.15)]
+    extra = [rock('brow', HC + Vector((0, -0.38, 0.24)), (0, -0.5, 1), 0.34, rnd, 0.3, 0.15)]
     for k in range(7):
         a = rad(-90) + (k - 3) * rad(32)
         b = HC + Vector((0.38 * math.cos(a), 0.38 * math.sin(a), 0.38))
